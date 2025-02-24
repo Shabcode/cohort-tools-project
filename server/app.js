@@ -20,7 +20,7 @@ const app = express();
 // Research Team - Set up CORS middleware here:
 // ...
 app.use(cors({
-  origin: ["http://localhost:5173", "http://example.com"] // URLs allowed to enter
+  origin: [`http://localhost:${PORT}`, "http://example.com"] // URLs allowed to enter
 }))
 app.use(express.json());
 app.use(morgan("dev"));
