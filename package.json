@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "cohort-tools-project",
   "version": "1.0.0",
   "main": "index.js",
@@ -18,4 +19,9 @@
   },
   "homepage": "https://github.com/Shabcode/cohort-tools-project#readme",
   "description": ""
+=======
+  "dependencies": {
+    "cors": "^2.8.5"
+  }
+>>>>>>> 77642b8fd7adabdf41b6239997c0afae94c6d500
 }
