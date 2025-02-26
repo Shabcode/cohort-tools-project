@@ -25,5 +25,4 @@ const cohortSchema = new Schema({
 
 
 const Cohort = model("Cohort",cohortSchema)
-
 module.exports = Cohort

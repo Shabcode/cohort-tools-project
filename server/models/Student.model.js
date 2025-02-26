@@ -1,6 +1,6 @@
-const mongoose = require("mongoose");
+const {Schema,model} = require("mongoose");
 
-const studentSchema = new mongoose.Schema({
+const studentSchema = new Schema({
     firstName: {type: String, required:true},
     lastName: {type: String, required:true},
     email: {type: String, required:true, unique:true},
@@ -16,8 +16,12 @@ const studentSchema = new mongoose.Schema({
     },
     background: {type: String, default: ""},
     image: {type:String, default: "https://i.imgur.com/r8bo8u7.png" },
-    cohort: {type: mongoose.Schema.Types.ObjectId, ref: "Cohort"},
-    projects: {type: [String]}
+    projects: {type: [String]},
+    cohort: {
+        type: Schema.Types.ObjectId,
+        ref: "Cohort"
+    }
 });
 
-module.exports = mongoose.model("Student", studentSchema);
+const Student = model("Student",studentSchema)
+module.exports = Student;
