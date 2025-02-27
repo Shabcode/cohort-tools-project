@@ -51,121 +51,164 @@ app.get("/docs", (req, res) => {
 
 
 // Create new cohort
-app.post("/api/cohorts", async (req, res) => {
+app.post("/api/cohorts", async (req, res, next) => {
   try {
     const cohort = new Cohort(req.body);
     const savedCohort = await cohort.save();
     res.status(201).json(savedCohort);
   } catch (error) {
-    res.status(400).json({ message: "Error creating cohort", error});
+    error.status = 400; //Bad Request
+    next(error); // Using next() to handle errors
   }
 });
 
 // Retrieve all cohorts
-app.get("/api/cohorts", async (req, res) => {
+app.get("/api/cohorts", async (req, res, next) => {
   try {
     const cohorts = await Cohort.find();
     res.json(cohorts);
   } catch (error) {
-    res.status(500).json({message: "Error fetching cohorts", error});
+    error.status = 500; //Bad Request server side
+    next(error); // Using next() to handle errors
   }
 });
 
 // Retrieve specific cohort by ID
-app.get("/api/cohorts/:cohortId", async (req, res) => {
+app.get("/api/cohorts/:cohortId", async (req, res, next) => {
   try {
     const cohort = await Cohort.findById(req.params.cohortId);
-    if (!cohort) return res.status(404).json({message: "Cohort not found"});
+    if (!cohort) {
+      const error = new Error("Cohort not found");
+      error.status = 404;
+      throw error;
+    }
     res.json(cohort);
   } catch (error) {
-    res.status(500).json({message: "Error fetching cohort", error});
+    if(!error.status) error.status = 500; // set 500 if 404 setting above didnt trigger
+    next(error);
   }
 });
 
 // Updates a specific cohort ID 
-app.put("/api/cohorts/:cohortId", async (req, res) => {
+app.put("/api/cohorts/:cohortId", async (req, res, next) => {
   try {
     const cohort = await Cohort.findByIdAndUpdate(req.params.cohortId, req.body, {new:true});
-    if (!cohort) return res.status(404).json({message: "Cohort not found"});
+    if (!cohort) {
+      const error = new Error("Cohort not found");
+      error.status = 404;
+      throw error;
+    }
     res.json(cohort);
   } catch (error) {
-    res.status(400).json({message: "Error updating cohort", error});
+    if(!error.status) error.status = 400;
+    next(error);
   }
 });
 
 // Deletes a specific cohort ID
-app.delete("/api/cohorts/:cohortId", async (req, res) => {
+app.delete("/api/cohorts/:cohortId", async (req, res, next) => {
   try {
     const cohort = await Cohort.findByIdAndDelete(req.params.cohortId);
-    if (!cohort) return res.status(404).json({message: "Cohort not found"});
+    if (!cohort) {
+      const error = new Error("Cohort not found");
+      error.status = 404;
+      throw error;
+    }
     res.status(204).send(); // send empty if not found 
   } catch {error} {
-    res.status(500).json({message: "Error deleting cohort", error});
+    if(!error.status) error.status = 500;
+    next(error);
   }
 });
 
 // Create new Student
-app.post("/api/students", async (req, res) => {
+app.post("/api/students", async (req, res, next) => {
   try {
     const student = new Student(req.body);
     const savedStudent = await student.save();
     res.status(201).json(savedStudent);
   } catch (error) {
-    res.status(400).json({message: "Error creating student", error});
+    error.status = 400;
+    next(error);
   }
 });
 
 // Retrieve all students
-app.get("/api/students", async (req, res) => {
+app.get("/api/students", async (req, res, next) => {
   try {
     const students = await Student.find().populate("cohort");
     res.json(students);
   } catch (error) {
-    res.status(500).json({message: "Error fetching students", error});
+    error.status = 500;
+    next(error);
   }
 });
 
 // Retrieve students for a cohort
-app.get("/api/students/cohort/:cohortId", async (req, res) => {
+app.get("/api/students/cohort/:cohortId", async (req, res, next) => {
   try {
     const students = await Student.find({cohort: req.params.cohortId}).populate("cohort");
     res.json(students);
   } catch (error) {
-    res.status(500).json({message: "Error fetching students", error});
+    error.status = 500;
+    next(error);
   }
 });
 
 // Retrieve a specific student by ID 
-app.get("/api/students/:studentId", async (req, res) => {
+app.get("/api/students/:studentId", async (req, res, next) => {
   try {
     const student = await Student.findById(req.params.studentId).populate("cohort");
-    if (!student) return res.status(404).json({message: "Student not found", error});
+    if (!student) {
+      const error = new Error("Student not found");
+      error.status = 404;
+      throw error;
+    }
     res.json(student);
   } catch (error) {
-    res.status(400).json({message: "Error fetching student", error});
+    if(!error.status) error.status = 500;
+    next(error);
   }
 });
 
 // Update a specific student by ID 
-app.put("/api/students/:studentId", async (req, res) => {
+app.put("/api/students/:studentId", async (req, res, next) => {
   try {
     const student = await Student.findByIdAndUpdate(req.params.studentId, req.body, {new:true});
-    if (!student) return res.status(404).json({message: "Student not found"});
+    if (!student) {
+      const error = new Error("Student not found");
+      error.status = 404;
+      throw error;
+    }
     res.json(student);
   } catch (error) {
-    res.status(400).json({message: "Error updating student", error});
+    if(!error.status) error.status = 400;
+    next(error);
   }
 });
 
 // Delete a specific student by ID 
-app.delete("/api/students/:studentId", async (req, res) => {
+app.delete("/api/students/:studentId", async (req, res, next) => {
   try {
     const student = await Student.findByIdAndDelete(req.params.studentId);
-    if(!student) return res.status(404).json({message: "student not found"});
+    if(!student) {
+      const error = new Error("Student not found");
+      error.status = 404;
+      throw error;
+    }
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({message: "Error deleting student", error});
+    if(!error.status) error.status = 500;
+    next(error);
   }
+});
+
+// Middleware error-handling
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  const status = err.status || 500;
+  const message = err.message || "Something on the server went wrong";
+  res.status(status).json({error:message});
 });
 
 // START SERVER
