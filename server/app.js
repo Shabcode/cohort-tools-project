@@ -5,6 +5,8 @@ const cors = require("cors");
 const PORT = 5005;
 const mongoose = require("mongoose");
 
+const {isAuthenticated} = require("./middleware/jwt.middleware");
+
 
 
 // STATIC DATA
@@ -48,10 +50,11 @@ app.get("/docs", (req, res) => {
 });
 
 // import the route 
-app.use("/api", require("../routes/cohort.routes"));
-app.use("/api", require("../routes/student.routes"));
-app.use("/auth", require("../routes/auth.routes"));
-app.use("/api", require("../routes"));
+app.use("/api", isAuthenticated, require("./routes/cohort.routes"));
+
+app.use("/api", isAuthenticated, require("./routes/student.routes"));
+app.use("/auth", require("./routes/auth.routes"));
+app.use("/api", require("./routes"));
 
 // Create new Student
 
